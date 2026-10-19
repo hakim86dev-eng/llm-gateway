@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci
+      - run: npm run test:coverage
+      - run: npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          push: false
+          tags: llm-gateway:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Smoke test the image
+        run: |
+          docker run -d --name gw -p 8080:8080 \
+            -e GATEWAY_API_KEYS=ci:sk-gw-ci-123456 -e ENABLE_MOCK_PROVIDER=true llm-gateway:ci
+          for i in $(seq 1 30); do curl -fsS localhost:8080/health && break; sleep 1; done
+          curl -fsS localhost:8080/v1/chat/completions \
+            -H 'authorization: Bearer sk-gw-ci-123456' -H 'content-type: application/json' \
+            -d '{"model":"demo","messages":[{"role":"user","content":"ping"}]}'
+          docker rm -f gw
