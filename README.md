@@ -1,6 +1,6 @@
 # llm-gateway
 
-[![CI](https://github.com/YOUR_GITHUB_USERNAME/llm-gateway/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/llm-gateway/actions/workflows/ci.yml)
+[![CI](https://github.com/hakimdev86-eng/llm-gateway/actions/workflows/ci.yml/badge.svg)](https://github.com/hakimdev86-eng/llm-gateway/actions/workflows/ci.yml)
 ![Node](https://img.shields.io/badge/node-20%20%7C%2022-339933)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6)
 ![Fastify](https://img.shields.io/badge/Fastify-5-000000)

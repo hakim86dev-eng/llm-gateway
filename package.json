@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "OpenAI-compatible LLM API gateway: provider routing, fallback, retries, caching, rate limiting, SSE streaming and usage tracking.",
   "license": "MIT",
-  "author": "Hakim Rashid <hakimrashid207@gmail.com>",
+  "author": "Hakim Rashid <hakim86.dev@gmail.com>",
   "type": "module",
   "main": "dist/server.js",
   "engines": {
